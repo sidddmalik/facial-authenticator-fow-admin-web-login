@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dog Breed Classification</title>
+    <link href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    <style>
+        .bg-dark {
+            background-color: #1a1552!important;
+        }
+
+        #result {
+            color: #1a1552;
+        }
+
+        body {
+            background-image: url("https://cdn.fstoppers.com/styles/large-16-9/s3/lead/2017/07/nine-dogs-in-grassy-field_jpg.webp");
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Dog Breeds Classification using CNN</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="content" style="margin-top:2em">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 bd">
+                        <h3>Dog Breed Classification: </h3>
+                        <br>
+                        <p>Dog Breed classification using Convolutional Neural Networks (CNN) is a state-of-the-art approach
+                            that leverages the power of deep learning to categorize and identify various species based on
+                            their visual characteristics. CNNs are a class of artificial neural networks specifically
+                            designed to process and recognize patterns in images.The process begins with a large dataset
+                            of Dog breeds images, carefully labeled with their corresponding breeds. The CNN model then
+                            learns to extract essential features and patterns from the images through multiple layers of
+                            convolution, pooling, and activation functions. Convolutional layers use small filters to
+                            scan the input image, capturing different features like edges, textures, and shapes.</p>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div>
+                            <h4>Sign In by Capturing Live Photo</h4>
+                            <!-- Button to capture photo from webcam -->
+                            <button type="button" class="btn btn-primary" id="capture-photo">Capture Photo</button>
+                            <!-- Add username and password fields -->
+                            <input type="text" name="username" id="username" placeholder="Username">
+                            <input type="password" name="password" id="password" placeholder="Password">
+                        </div>
+
+
+                        <div class="image-section" style="display:none;">
+                            <div class="img-preview">
+                                <div id="imagePreview">
+                                </div>
+                            </div>
+                            <div>
+                                <!-- Change predict button to sign-in button -->
+                                <button type="button" class="btn btn-success" id="btn-signin">Sign In</button>
+                            </div>
+                        </div>
+
+                        <div class="loader" style="display:none;"></div>
+
+                        <h3>
+                            <span id="result"> </span>
+                        </h3>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<footer>
+    <script>
+        $(document).ready(function () {
+            // Init
+            $('.image-section').hide();
+            $('.loader').hide();
+            $('#result').hide();
+
+            // Webcam initialization
+            Webcam.set({
+                width: 320,
+                height: 240,
+                image_format: 'jpeg',
+                jpeg_quality: 90
+            });
+            Webcam.attach('#imagePreview');
+
+            // Capture photo from webcam
+            $('#capture-photo').click(function () {
+                $('.image-section').show();
+                $('#btn-signin').show();
+                $('#result').text('');
+                $('#result').hide();
+                Webcam.snap(function (data_uri) {
+                    $('#imagePreview').html('<img src="' + data_uri + '">');
+                });
+            });
+
+            // Sign-in function
+            $('#btn-signin').click(function () {
+                var form_data = new FormData();
+                form_data.append('username', $('#username').val());
+                form_data.append('password', $('#password').val());
+                form_data.append('image', $('#imagePreview').find('img')[0].src);
+
+                // Show loading animation
+                $(this).hide();
+                $('.loader').show();
+
+                // Make sign-in request
+                $.ajax({
+                    type: 'POST',
+                    url: '/signin',
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    async: true,
+                    success: function (data) {
+                        // Get and display the result
+                        $('.loader').hide();
+                        $('#result').fadeIn(600);
+                        $('#result').text('Result: ' + data);
+                        console.log('Success!');
+                    },
+                });
+            });
+
+        });
+
+    </script>
+</footer>
+
+</html>
